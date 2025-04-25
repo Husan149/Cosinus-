@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kosinus Funktsiyasining Grafigi</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        #plotly-graph {
+            width: 80%;
+            height: 65%;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .calculator {
+            position: fixed;
+            bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+            font-size: 16px;
+            z-index: 10;
+        }
+
+        .calculator h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .calculator input {
+            padding: 10px;
+            width: 85%;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .calculator input:focus {
+            border-color: #3f8ae0;
+        }
+
+        .calculator button {
+            padding: 12px;
+            width: 85%;
+            background-color: #3f8ae0;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .calculator button:hover {
+            background-color: #356bbf;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Kosinus Funktsiyasining Grafigi Toshtemirova Sarvara Mustaqil ishi</h1>
+
+    <div id="plotly-graph"></div>
+
+    <!-- Kalkulyator -->
+    <div class="calculator">
+        <h3>Kosinus Kalkulyatori</h3>
+        <input type="number" id="degreeInput" placeholder="Gradusni kiriting (°)" />
+        <button onclick="calculateCos()">Hisoblash</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // Kosinus funksiyasining ma'lumotlarini yaratish
+        var x = [];
+        var y = [];
+
+        for (var i = -2 * Math.PI; i <= 2 * Math.PI; i += 0.1) {
+            x.push(i);
+            y.push(Math.cos(i)); // Sinus o'rnida kosinus
+        }
+
+        // Burchaklardagi maxsus qiymatlar (gradusda)
+        var anglesDegrees = [0, 30, 45, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360];
+        var anglesRadians = anglesDegrees.map(function(degree) {
+            return degree * (Math.PI / 180); // Graduslarni radianlarga o'zgartirish
+        });
+        var specialYValues = anglesRadians.map(function(angle) {
+            return Math.cos(angle); // Kosinus qiymatini hisoblash
+        });
+
+        // Kosinusning -1 va 1 qiymatlariga mos keladigan nuqtalar
+        var extremeX = [-Math.PI / 2, Math.PI / 2]; // cos(x) = -1 va cos(x) = 1 nuqtalari
+        var extremeY = [-1, 1];
+
+        // Plotly.js yordamida grafigini chizish
+        var data = [
+            {
+                x: x,
+                y: y,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'cos(x)',
+                line: {color: '#FF6F61'} // Kosinus funksiyasining chizig'ini ochiq qizil rangda
+            },
+            {
+                x: anglesRadians, // Maxsus burchaklardagi qiymatlar
+                y: specialYValues,
+                mode: 'markers+text', // Nuqtalar va ularning qiymatlari
+                type: 'scatter',
+                name: 'Maxsus qiymatlar',
+                text: anglesDegrees.map(function(degree) {
+                    return degree + "°"; // Graduslarni matn sifatida ko'rsatish
+                }),
+                textposition: 'top center',
+                marker: {color: '#FFB347', size: 12} // Maxsus qiymatlar uchun ochiq sariq rang
+            },
+            {
+                x: extremeX,  // cos(x) = -1 va cos(x) = 1 nuqtalari
+                y: extremeY,
+                mode: 'markers+text',
+                type: 'scatter',
+                name: 'Maksimal va minimal qiymatlar',
+                text: ['cos(x) = -1', 'cos(x) = 1'], // qiymatlarni ko'rsatish
+                textposition: 'bottom center',
+                marker: {color: '#00BFFF', size: 12} // Maksimal va minimal qiymatlar uchun ochiq ko'k rang
+            }
+        ];
+
+        var layout = {
+            title: 'Kosinus Funktsiyasining Grafigi',
+            xaxis: {
+                title: 'x (radianlarda)',
+                tickvals: [-2*Math.PI, -Math.PI, -Math.PI/2, 0, Math.PI/2, Math.PI, 2*Math.PI],
+                ticktext: ['-2π', '-π', '-π/2', '0', 'π/2', 'π', '2π']
+            },
+            yaxis: {
+                title: 'cos(x)',
+                tickvals: [-1, 0, 1], // cos(x) ning -1, 0, va 1 qiymatlarini ko'rsatish
+                ticktext: ['-1', '0', '1']
+            },
+            paper_bgcolor: "rgba(255, 255, 255, 0.9)", // Qog'oz fonini juda ochiq rangda qilish
+            plot_bgcolor: "rgba(255, 255, 255, 0.9)" // Grafik orqa fonini juda ochiq rangda qilish
+        };
+
+        Plotly.newPlot('plotly-graph', data, layout);
+
+        // Kalkulyator funksiyasi
+        function calculateCos() {
+            var degree = document.getElementById('degreeInput').value;
+            if (degree === '') {
+                document.getElementById('result').innerHTML = 'Iltimos, gradusni kiriting.';
+                return;
+            }
+
+            var radians = degree * (Math.PI / 180); // Gradusni radianlarga aylantirish
+            var cosValue = Math.cos(radians); // Kosinus qiymatini hisoblash
+
+            document.getElementById('result').innerHTML = 
+                'Gradus: ' + degree + '°<br>' +
+                'Radian: ' + radians.toFixed(4) + ' rad<br>' +
+                'Kosinus: ' + cosValue.toFixed(4);
+
+            // Grafikda qizil nuqtani qo'shish
+            addRedPoint(radians, cosValue);
+        }
+
+        // Grafikda qizil nuqtani qo'shish
+        function addRedPoint(radians, cosValue) {
+            var redPointData = {
+                x: [radians],
+                y: [cosValue],
+                mode: 'markers',
+                type: 'scatter',
+                name: 'Kiritilgan qiymat',
+                marker: {color: 'red', size: 12}
+            };
+
+            Plotly.addTraces('plotly-graph', redPointData);
+        }
+    </script>
+</body>
+</html>
